@@ -16,6 +16,9 @@ import matplotlib.pyplot as plt
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
+import matplotlib
+matplotlib.get_cachedir()
+
 # Load the trained model and scaler
 model = load_model('trained_model.h5')
 scaler = joblib.load('scaler.pkl')
