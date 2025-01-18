@@ -14,8 +14,8 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import matplotlib.pyplot as plt
 
 # Load the trained model and scaler
-model = load_model('C:/Users/Tanvi/Documents/MK Project/trained_model.h5')
-scaler = joblib.load('C:/Users/Tanvi/Documents/MK Project/scaler.pkl')
+model = load_model('trained_model.h5')
+scaler = joblib.load('scaler.pkl')
 
 # Initialize Flask app
 app = Flask(__name__)
