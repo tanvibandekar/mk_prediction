@@ -13,6 +13,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import matplotlib.pyplot as plt
 
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
 # Load the trained model and scaler
 model = load_model('trained_model.h5')
 scaler = joblib.load('scaler.pkl')
