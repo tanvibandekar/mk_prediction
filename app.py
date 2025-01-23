@@ -210,7 +210,6 @@ form_html = """
 <body>
     <div class="navbar">
         <h1>Imatinib Concentration Predictor</h1>
-        <img src="images/dose.jpg" alt="Logo">
     </div>
     <div class="scroll-p">
         <marquee width="800">Welcome to ImatiPredict!
