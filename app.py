@@ -32,6 +32,83 @@ def predict_concentration(age, weight, height, time_point):
     predicted_concentration = model.predict(patient_data_scaled)
     return predicted_concentration[0][0]
 
+
+# HTML template with the form
+# form_html = """
+# <!DOCTYPE html>
+# <html lang="en">
+
+# <head>
+#     <meta charset="UTF-8">
+#     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+#     <title>Patient Prediction</title>
+#     <script>
+
+#         async function predictConcentration(event) {
+#             event.preventDefault(); // Prevent form submission from reloading the page
+
+#             const age = parseFloat(document.getElementById("age").value);
+#             const weight = parseFloat(document.getElementById("weight").value);
+#             const height = parseFloat(document.getElementById("height").value);
+#             const timePoint = parseFloat(document.getElementById("time_point").value);
+
+#             const requestData = {
+#                 age: age,
+#                 weight: weight,
+#                 height: height,
+#                 time_point: timePoint
+#             };
+
+#             try {
+#                 const response = await fetch("http://127.0.0.1:5000/predict", {
+#                     method: "POST",
+#                     headers: {
+#                         "Content-Type": "application/json"
+#                     },
+#                     body: JSON.stringify(requestData)
+#                 });
+
+#                 if (response.ok) {
+#                     const result = await response.json();
+#                     document.getElementById("result").innerText =
+#                         `Predicted concentration: ${result.predicted_concentration.toFixed(2)} mg/L`;
+#                 } else {
+#                     const errorData = await response.json();
+#                     document.getElementById("result").innerText =
+#                         `Error: ${errorData.error || "Unknown error occurred"}`;
+#                 }
+#             } catch (error) {
+#                 document.getElementById("result").innerText = `Error: ${error.message}`;
+#             }
+#         }
+
+
+#     </script>
+# </head>
+
+# <body>
+#     <h1>Predict Imatinib Serum Concentration</h1>
+#     <form id="predictionForm" onsubmit="predictConcentration(event)">
+#         <label for="age">Age (years):</label>
+#         <input type="number" id="age" name="age" step="0.1" required><br><br>
+
+#         <label for="weight">Weight (kg):</label>
+#         <input type="number" id="weight" name="weight" step="0.1" required><br><br>
+
+#         <label for="height">Height (cm):</label>
+#         <input type="number" id="height" name="height" step="0.1" required><br><br>
+
+#         <label for="time_point">Time (hours):</label>
+#         <input type="number" id="time_point" name="time_point" step="0.1" required><br><br>
+
+#         <button type="submit">Predict</button>
+#     </form>
+#     <p id="result"></p>
+# </body>
+
+# </html>
+# """
+
 form_html = """
 <!DOCTYPE html>
 <html lang="en">
@@ -183,7 +260,7 @@ form_html = """
             };
 
             try {
-                const response = await fetch("http://127.0.0.1:5000/predict", {
+                const response = await fetch("http://127.0.0.1:8000/predict", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -273,6 +350,44 @@ def predict():
         weight = float(data["weight"])
         height = float(data["height"])
         time_point = float(data["time_point"])
+        
+        import pandas as pd
+        from sklearn.preprocessing import StandardScaler
+        from sklearn.model_selection import train_test_split
+        from tensorflow import keras
+        from tensorflow.keras import layers
+        # Load the simulated data
+        df = pd.read_csv('simulated_patient_data.csv')
+
+        # Features (input data)
+        X = df[['Age (years)', 'Weight (kg)', 'Height (cm)', 'BMI', 'BSA (m^2)',
+                'Clearance (L/h)', 'Vd (L)', 'Time (hours)']].values
+
+        # Target variable (serum concentration)
+        y = df['Concentration (mg/L)'].values
+
+        # Standardize the features
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+
+        # Split the data into training and testing sets
+        X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+        # Build the neural network model with dropout and additional tuning
+        model = keras.Sequential([
+            layers.Dense(128, activation='relu', input_dim=X_train.shape[1]),
+            layers.Dropout(0.2),  # Add dropout for regularization
+            layers.Dense(64, activation='relu'),
+            layers.Dropout(0.2),  # Add dropout for regularization
+            layers.Dense(32, activation='relu'),
+            layers.Dense(1)  # Single output for serum concentration
+        ])
+
+        # Compile the model
+        model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.001), loss='mean_squared_error')
+
+        # Train the model
+        model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
 
         # Predict concentration
         predicted_conc = predict_concentration(age, weight, height, time_point)
@@ -286,5 +401,5 @@ def predict():
 
 # Run the Flask app
 if __name__ == "__main__":
-    # app.run(debug=True)
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True)
+    # app.run(host='0.0.0.0', port=5000)
