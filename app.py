@@ -32,83 +32,6 @@ def predict_concentration(age, weight, height, time_point):
     predicted_concentration = model.predict(patient_data_scaled)
     return predicted_concentration[0][0]
 
-
-# HTML template with the form
-# form_html = """
-# <!DOCTYPE html>
-# <html lang="en">
-
-# <head>
-#     <meta charset="UTF-8">
-#     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-#     <title>Patient Prediction</title>
-#     <script>
-
-#         async function predictConcentration(event) {
-#             event.preventDefault(); // Prevent form submission from reloading the page
-
-#             const age = parseFloat(document.getElementById("age").value);
-#             const weight = parseFloat(document.getElementById("weight").value);
-#             const height = parseFloat(document.getElementById("height").value);
-#             const timePoint = parseFloat(document.getElementById("time_point").value);
-
-#             const requestData = {
-#                 age: age,
-#                 weight: weight,
-#                 height: height,
-#                 time_point: timePoint
-#             };
-
-#             try {
-#                 const response = await fetch("http://127.0.0.1:5000/predict", {
-#                     method: "POST",
-#                     headers: {
-#                         "Content-Type": "application/json"
-#                     },
-#                     body: JSON.stringify(requestData)
-#                 });
-
-#                 if (response.ok) {
-#                     const result = await response.json();
-#                     document.getElementById("result").innerText =
-#                         `Predicted concentration: ${result.predicted_concentration.toFixed(2)} mg/L`;
-#                 } else {
-#                     const errorData = await response.json();
-#                     document.getElementById("result").innerText =
-#                         `Error: ${errorData.error || "Unknown error occurred"}`;
-#                 }
-#             } catch (error) {
-#                 document.getElementById("result").innerText = `Error: ${error.message}`;
-#             }
-#         }
-
-
-#     </script>
-# </head>
-
-# <body>
-#     <h1>Predict Imatinib Serum Concentration</h1>
-#     <form id="predictionForm" onsubmit="predictConcentration(event)">
-#         <label for="age">Age (years):</label>
-#         <input type="number" id="age" name="age" step="0.1" required><br><br>
-
-#         <label for="weight">Weight (kg):</label>
-#         <input type="number" id="weight" name="weight" step="0.1" required><br><br>
-
-#         <label for="height">Height (cm):</label>
-#         <input type="number" id="height" name="height" step="0.1" required><br><br>
-
-#         <label for="time_point">Time (hours):</label>
-#         <input type="number" id="time_point" name="time_point" step="0.1" required><br><br>
-
-#         <button type="submit">Predict</button>
-#     </form>
-#     <p id="result"></p>
-# </body>
-
-# </html>
-# """
-
 form_html = """
 <!DOCTYPE html>
 <html lang="en">
@@ -260,7 +183,7 @@ form_html = """
             };
 
             try {
-                const response = await fetch("http://127.0.0.1:5000/predict", {
+                const response = await fetch("http://192.168.0.102:5000/predict", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -364,4 +287,5 @@ def predict():
 
 # Run the Flask app
 if __name__ == "__main__":
-    app.run(debug=True)
+    # app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)
