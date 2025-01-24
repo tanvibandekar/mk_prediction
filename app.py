@@ -245,42 +245,48 @@ form_html = """
     </style>
     <script>
         async function predictConcentration(event) {
-            event.preventDefault(); // Prevent form submission from reloading the page
+    event.preventDefault(); // Prevent form submission from reloading the page
 
-            const age = parseFloat(document.getElementById("age").value);
-            const weight = parseFloat(document.getElementById("weight").value);
-            const height = parseFloat(document.getElementById("height").value);
-            const timePoint = parseFloat(document.getElementById("time_point").value);
+    const age = parseFloat(document.getElementById("age").value);
+    const weight = parseFloat(document.getElementById("weight").value);
+    const height = parseFloat(document.getElementById("height").value);
+    const timePoint = parseFloat(document.getElementById("time_point").value);
 
-            const requestData = {
-                age: age,
-                weight: weight,
-                height: height,
-                time_point: timePoint
-            };
+    const requestData = {
+        age: age,
+        weight: weight,
+        height: height,
+        time_point: timePoint
+    };
 
-            try {
-                const response = await fetch("http://127.0.0.1:8000/predict", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(requestData)
-                });
+    // Dynamically set the backend URL based on deployment environment
+    const backendURL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+        ? "http://127.0.0.1:5000/predict"  // Local development
+        : "https://dose-prediction.onrender.com";  // Deployed URL (replace with your actual domain)
 
-                if (response.ok) {
-                    const result = await response.json();
-                    document.getElementById("result").innerText =
-                        `Predicted concentration: ${result.predicted_concentration.toFixed(2)} mg/L`;
-                } else {
-                    const errorData = await response.json();
-                    document.getElementById("result").innerText =
-                        `Error: ${errorData.error || "Unknown error occurred"}`;
-                }
-            } catch (error) {
-                document.getElementById("result").innerText = `Error: ${error.message}`;
-            }
+    try {
+        const response = await fetch(backendURL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            document.getElementById("result").innerText =
+                `Predicted concentration: ${result.predicted_concentration.toFixed(2)} mg/L`;
+        } else {
+            const errorData = await response.json();
+            document.getElementById("result").innerText =
+                `Error: ${errorData.error || "Unknown error occurred"}`;
         }
+    } catch (error) {
+        document.getElementById("result").innerText = `Error: ${error.message}`;
+    }
+}
+
     </script>
 </head>
 
