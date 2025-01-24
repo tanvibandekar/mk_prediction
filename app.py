@@ -275,10 +275,11 @@ form_html = """
         
                 if (response.ok) {
                     const result = await response.json();
+                    const predictedConcentration = parseFloat(result.predicted_concentration).toFixed(2);
                     document.getElementById("result").innerText =
-                        `Predicted concentration: ${result.predicted_concentration.toFixed(2)} mg/L`;
+                        `Predicted concentration: ${predictedConcentration} mg/L`;
                 } else {
-                    const errorData = await response.text();
+                    const errorData = await response.text(); // Use .text() if response is not JSON
                     document.getElementById("result").innerText =
                         `Error: ${errorData || "Unknown error occurred"}`;
                 }
