@@ -261,7 +261,7 @@ form_html = """
 
     // Dynamically set the backend URL based on deployment environment
     const backendURL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-        ? "http://127.0.0.1:5000/predict"  // Local development
+        ? "http://127.0.0.1:8000/predict"  // Local development
         : "https://dose-prediction.onrender.com";  // Deployed URL (replace with your actual domain)
 
     try {
