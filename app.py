@@ -189,23 +189,22 @@ form_html = """
                 : "https://dose-prediction.onrender.com";  // Deployed URL (replace with your actual domain)
         
             try {
-                const response = await fetch(backendURL, {
+                const response = await fetch("http://127.0.0.1:8000/predict", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify(requestData)
                 });
-        
+
                 if (response.ok) {
                     const result = await response.json();
-                    const predictedConcentration = parseFloat(result.predicted_concentration).toFixed(2);
                     document.getElementById("result").innerText =
-                        `Predicted concentration: ${predictedConcentration} mg/L`;
+                        `Predicted concentration: ${result.predicted_concentration.toFixed(2)} mg/L`;
                 } else {
-                    const errorData = await response.text(); // Use .text() if response is not JSON
+                    const errorData = await response.json();
                     document.getElementById("result").innerText =
-                        `Error: ${errorData || "Unknown error occurred"}`;
+                        `Error: ${errorData.error || "Unknown error occurred"}`;
                 }
             } catch (error) {
                 document.getElementById("result").innerText = `Error: ${error.message}`;
